@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('imagens/cassino.jpg') no-repeat center center;
+      background-size: cover;
+      opacity: 0.85;
+      filter: brightness(0.25) blur(2px);
+      z-index: -2;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: -1;
+    }
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      background-color: rgba(20, 20, 20, 0.85);
+      padding: 35px 25px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.5);
+      backdrop-filter: blur(10px);
+      color: #ffffff;
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #00bfff;
+      text-shadow: 0 0 15px #00bfff88;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #1b1b1b;
+      color: #e0e0e0;
+      box-shadow: inset 0 0 6px rgba(0, 191, 255, 0.4);
+      transition: 0.3s ease;
+    }
+    input::placeholder {
+      color: #bbbbbb;
+    }
+    input:focus {
+      outline: none;
+      background: #252525;
+      box-shadow: 0 0 10px #00bfff;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #00bfff, #1e90ff);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.4s ease, transform 0.2s;
+      box-shadow: 0 0 10px #00bfff;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #1e90ff, #00bfff);
+      transform: scale(1.03);
+    }
+    #error-message {
+      color: #ff4d4d;
+      font-size: 14px;
+      margin-top: 12px;
+      display: none;
+    }
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 22px;
+      }
+      input, button {
+        font-size: 15px;
+        padding: 12px;
+      }
+      .login-container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required autocomplete="off" />
+      <input type="password" id="password" placeholder="Senha" required autocomplete="off" />
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="error-message"></p>
+  </div>
+
+  <!-- Firebase Login -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDgawCGiT-wsWiNADWh0aj6LGGubzSfFC4",
+      authDomain: "metodoshot.firebaseapp.com",
+      projectId: "metodoshot",
+      storageBucket: "metodoshot.appspot.com",
+      messagingSenderId: "416296569989",
+      appId: "1:416296569989:web:ed96af0ab69f8c52bfedec"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log('Usuário logado:', userCredential.user);
+          window.location.href = '/'; // Redireciona para a raiz do site
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorElement = document.getElementById('error-message');
+          if (errorCode === 'auth/too-many-requests') {
+            errorElement.textContent = 'Muitas tentativas de login. Tente novamente mais tarde!';
+          } else {
+            errorElement.textContent = 'Login incorreto. Tente novamente!';
+          }
+          errorElement.style.display = 'block';
+          console.error('Erro no login:', error);
+        });
+    });
+  </script>
+</body>
+</html>
